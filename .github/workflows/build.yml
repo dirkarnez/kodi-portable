@@ -1,0 +1,48 @@
+name: portable-release-actions-workflow
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+      - 'c*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+permissions:
+    contents: write
+    
+jobs:
+  build:
+    name: Create Release
+    runs-on: windows-latest
+    env:
+      targetZip: kodi-portable-${{ github.ref_name }}.zip
+      version: 20.2-Nexus
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: installer
+        shell: cmd
+        run: |
+          curl https://mirrors.kodi.tv/releases/windows/win64/kodi-${{ env.version }}-x64.exe?https=1 -L --output installer.exe &&^
+          "%PROGRAMFILES%\7-Zip\7z.exe" x installer.exe -oinstallation\app &&^
+          cd installation\app &&^
+          rmdir /s /q $PLUGINSDIR &&^
+          rmdir /s /q $TEMP &&^
+          del /s /q Uninstall.exe &&^
+          dir
+          
+      - shell: cmd
+        run: xcopy /H /Y /C "kodi.exe.Portable.cmd" "installation\app"
+          
+      - name: Archive Release
+        uses: thedoctor0/zip-release@master
+        with:
+          type: 'zip'
+          directory: "installation"
+          filename: "${{ env.targetZip }}"
+          
+      - name: Release prebuilt
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "installation/${{ env.targetZip }}"
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
