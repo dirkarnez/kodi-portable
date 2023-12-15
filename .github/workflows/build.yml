@@ -31,7 +31,7 @@ jobs:
           dir
           
       - shell: cmd
-        run: xcopy /H /Y /C "kodi.exe.Portable.cmd" "installation\app"
+        run: xcopy /H /Y /C "kodi.exe.Portable.cmd" "installation"
           
       - name: Archive Release
         uses: thedoctor0/zip-release@master
