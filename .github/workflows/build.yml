@@ -23,7 +23,7 @@ jobs:
         shell: cmd
         run: |
           curl https://mirrors.kodi.tv/releases/windows/win64/kodi-${{ env.version }}-x64.exe?https=1 -L --output installer.exe &&^
-          "%PROGRAMFILES%\7-Zip\7z.exe" x installer.exe -oinstallation\app &&^
+          7z x installer.exe -oinstallation\app &&^
           cd installation\app &&^
           rmdir /s /q $PLUGINSDIR &&^
           rmdir /s /q $TEMP &&^
